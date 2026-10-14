@@ -1,11 +1,52 @@
-import { Link } from 'react-router-dom'
+import { Link, NavLink, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { logout } from './authSlice.js'
+import Login from './pages/Login.jsx'
+import Register from './pages/Register.jsx'
+
+function Header() {
+  const user = useSelector(state => state.auth.user)
+  const dispatch = useDispatch()
+
+  return (
+    <header className="site-header">
+      <nav className="nav page" aria-label="Main navigation">
+        <Link className="brand" to="/events"><span className="brand-mark">✦</span> Event Nest</Link>
+        <div className="nav-links">
+          <NavLink to="/events">Explore</NavLink>
+          {user && <NavLink to="/my-events">My Events</NavLink>}
+        </div>
+        <div className="nav-account">
+          {user ? <><span className="welcome">Hi, {user.name.split(' ')[0]}</span><button className="text-button" onClick={() => dispatch(logout())}>Log out</button></> : <><Link to="/login">Log in</Link><Link className="button small" to="/register">Sign up</Link></>}
+        </div>
+      </nav>
+    </header>
+  )
+}
+
+function Protected({ children }) {
+  const user = useSelector(state => state.auth.user)
+  const location = useLocation()
+  return user ? children : <Navigate to="/login" state={{ from: location.pathname }} replace />
+}
+
+function Welcome() {
+  return <main className="page"><h1>Find your next event</h1><p>Discover concerts, sports, and more.</p></main>
+}
 
 export default function App() {
   return (
-    <main className="page">
-      <h1>Event Nest</h1>
-      <p>Find an event worth remembering.</p>
-      <Link to="/events">Explore events</Link>
-    </main>
+    <>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Navigate to="/events" replace />} />
+        <Route path="/events" element={<Welcome />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/my-events" element={<Protected><Welcome /></Protected>} />
+        <Route path="*" element={<main className="page"><h1>Page not found</h1><Link to="/events">Back to events</Link></main>} />
+      </Routes>
+      <footer className="site-footer"><div className="page">Event Nest · Built for Web Programming Assignment 2</div></footer>
+    </>
   )
 }
