@@ -5,6 +5,7 @@ import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Events from './pages/Events.jsx'
 import EventDetails from './pages/EventDetails.jsx'
+import MyEvents from './pages/MyEvents.jsx'
 
 function Header() {
   const user = useSelector(state => state.auth.user)
@@ -42,7 +43,7 @@ export default function App() {
         <Route path="/events/:id" element={<EventDetails />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/my-events" element={<Protected><main className="page"><h1>My Events</h1></main></Protected>} />
+        <Route path="/my-events" element={<Protected><MyEvents /></Protected>} />
         <Route path="*" element={<main className="page"><h1>Page not found</h1><Link to="/events">Back to events</Link></main>} />
       </Routes>
       <footer className="site-footer"><div className="page">Event Nest · Built for Web Programming Assignment 2</div></footer>

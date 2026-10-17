@@ -1,13 +1,17 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { clearSelected, loadEvent } from '../eventsSlice.js'
 import { eventCategory, eventDate, eventImage, eventLocation, eventVenue } from '../eventHelpers.js'
+import { cancelRegistration, isPastEvent, registerEvent } from '../registrationsSlice.js'
 
 export default function EventDetails() {
   const { id } = useParams()
   const dispatch = useDispatch()
   const { selected: event, detailStatus, detailError } = useSelector(state => state.events)
+  const user = useSelector(state => state.auth.user)
+  const registrations = useSelector(state => user ? state.registrations.byUser[user.id] || [] : [])
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     dispatch(loadEvent(id))
@@ -21,6 +25,18 @@ export default function EventDetails() {
   const venue = eventVenue(event)
   const image = eventImage(event)
   const price = event.priceRanges?.[0]
+  const registered = registrations.some(item => item.id === event.id)
+  const past = isPastEvent({ dateTime: event.dates?.start?.dateTime, localDate: event.dates?.start?.localDate })
+
+  function handleRegistration() {
+    dispatch(registerEvent({ userId: user.id, event }))
+    setMessage('You are registered for this event.')
+  }
+
+  function handleCancellation() {
+    dispatch(cancelRegistration({ userId: user.id, eventId: event.id }))
+    setMessage('Registration cancelled.')
+  }
 
   return (
     <main className="page detail-page">
@@ -45,6 +61,8 @@ export default function EventDetails() {
             {venue?.address?.line1 && <><dt>Address</dt><dd>{venue.address.line1}</dd></>}
             {price && <><dt>Ticket price</dt><dd>{price.min}–{price.max} {price.currency}</dd></>}
           </dl>
+          {message && <p className="success-message" role="status">{message}</p>}
+          {past ? <p className="muted">This event has already taken place.</p> : registered ? <><p className="registered-label">✓ You are registered</p><button className="outline-button full-width" onClick={handleCancellation}>Cancel registration</button></> : user ? <button className="button full-width" onClick={handleRegistration}>Register for event</button> : <Link className="button full-width" to="/login" state={{ from: `/events/${event.id}` }}>Log in to register</Link>}
         </div>
       </div>
     </main>
