@@ -1,3 +1,4 @@
+import React from 'react'
 import { Link } from 'react-router-dom'
 import { eventCategory, eventDate, eventImage, eventLocation } from '../eventHelpers.js'
 

@@ -1,3 +1,4 @@
+import React from 'react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -26,7 +27,7 @@ export default function EventDetails() {
   const image = eventImage(event)
   const price = event.priceRanges?.[0]
   const registered = registrations.some(item => item.id === event.id)
-  const past = isPastEvent({ dateTime: event.dates?.start?.dateTime, localDate: event.dates?.start?.localDate })
+  const past = isPastEvent({ dateTime: event.dates?.start?.dateTime, localDate: event.dates?.start?.localDate, localTime: event.dates?.start?.localTime })
 
   function handleRegistration() {
     dispatch(registerEvent({ userId: user.id, event }))

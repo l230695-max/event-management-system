@@ -11,7 +11,7 @@ function savedRegistrations() {
 }
 
 export function isPastEvent(event) {
-  const start = event.dateTime || event.localDate
+  const start = event.dateTime || (event.localDate ? `${event.localDate}T${event.localTime || '23:59:59'}` : '')
   return Boolean(start && new Date(start).getTime() < Date.now())
 }
 
